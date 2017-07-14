@@ -7,7 +7,8 @@ import Data.Time.LocalTime
 import Data.List
 import Control.Exception
 
-topicFileName = "./topiclist"
+topicFileName = "/home/Quarry/code/slatesheet/topiclist"
+topicFolderName = "/home/Quarry/code/slatesheet/topics/"
 
 dispatch :: [String] -> IO ()
 dispatch command@(c:argList)
@@ -80,4 +81,6 @@ getTopicFile :: Int -> IO String
 getTopicFile topicIdx = do
     topics <- readFile topicFileName
     let topicsList = lines topics
-    return (topicsList !! topicIdx)
+        topicName = (topicsList !! topicIdx)
+        topicFileName = topicFolderName ++ topicName
+    return topicFileName
