@@ -7,11 +7,14 @@ import Data.Time.LocalTime
 import Data.List
 import Control.Exception
 
-boardfileName = "./boardfile"
+topicFileName = "./topiclist"
+boardFileName = "./boardfile"
 
 dispatch :: [String] -> IO ()
 dispatch command@(c:argList)
     |c == "-h" = displayHelp
+    |c == "ls" = listTopics
+    |c == "add" = addTopic argList
     |c == "read" = readPost argList
     |c == "post" = writePost argList
 dispatch _ = displayHelp
@@ -20,9 +23,24 @@ main = do
     command <- getArgs
     dispatch command
 
+listTopics :: IO ()
+listTopics = do
+    topics <- readFile topicFileName
+    let topicList = lines topics
+        numberedTopicList = zipWith (\n line -> show n ++ 
+                                    " - " ++
+                                    line)
+                                    [0..] topicList
+    putStrLn "TOPICS OF CAPRICORN"
+    putStr $ unlines numberedTopicList
+
+addTopic :: [String] -> IO ()
+addTopic [topicName] = do
+    appendFile topicFileName (topicName ++ "\n")    
+
 readPost :: [String] -> IO ()
 readPost _ = do
-    contents <- readFile boardfileName
+    contents <- readFile boardFileName
     putStr contents
 
 writePost :: [String] -> IO ()
@@ -34,7 +52,7 @@ writePost [postText] = do
         postString = (show localTime) ++ "\n" ++ 
                     loginName ++ " wrote:\n" ++ 
                     postText ++ "\n\n"
-    appendFile boardfileName postString
+    appendFile boardFileName postString
 
 displayHelp = do
     putStrLn ""
