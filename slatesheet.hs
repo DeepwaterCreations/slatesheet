@@ -8,7 +8,6 @@ import Data.List
 import Control.Exception
 
 topicFileName = "./topiclist"
-boardFileName = "./boardfile"
 
 dispatch :: [String] -> IO ()
 dispatch command@(c:argList)
@@ -34,12 +33,16 @@ addTopic [topicName] = do
     appendFile topicFileName (topicName ++ "\n")    
 
 readPost :: [String] -> IO ()
-readPost _ = do
-    contents <- readFile boardFileName
+readPost [topicIdxStr] = do
+    let topicIdx = read topicIdxStr
+    topicFileName <- getTopicFile topicIdx
+    contents <- readFile topicFileName
     putStr contents
 
 writePost :: [String] -> IO ()
-writePost [postText] = do
+writePost [topicIdxStr, postText] = do
+    let topicIdx = read topicIdxStr
+    topicFileName <- getTopicFile topicIdx
     loginName <- getLoginName
     currentTime <- getCurrentTime
     currentTimeZone <- getCurrentTimeZone
@@ -47,7 +50,7 @@ writePost [postText] = do
         postString = (show localTime) ++ "\n" ++ 
                     loginName ++ " wrote:\n" ++ 
                     postText ++ "\n\n"
-    appendFile boardFileName postString
+    appendFile topicFileName postString
 
 displayHelp = do
     putStrLn ""
@@ -70,3 +73,9 @@ getNumberedTopics = do
                                     line)
                                     [0..] topicList
     return numberedTopicList
+
+getTopicFile :: Int -> IO String
+getTopicFile topicIdx = do
+    topics <- readFile topicFileName
+    let topicsList = lines topics
+    return (topicsList !! topicIdx)
