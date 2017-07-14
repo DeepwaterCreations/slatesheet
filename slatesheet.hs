@@ -2,6 +2,8 @@ import System.Environment
 import System.Directory
 import System.IO
 import System.Posix.User
+import Data.Time.Clock
+import Data.Time.LocalTime
 import Data.List
 import Control.Exception
 
@@ -26,7 +28,13 @@ readPost _ = do
 writePost :: [String] -> IO ()
 writePost [postText] = do
     loginName <- getLoginName
-    appendFile boardfileName (loginName ++ " wrote:\n" ++ postText ++ "\n\n")
+    currentTime <- getCurrentTime
+    currentTimeZone <- getCurrentTimeZone
+    let localTime = utcToLocalTime currentTimeZone currentTime
+        postString = (show localTime) ++ "\n" ++ 
+                    loginName ++ " wrote:\n" ++ 
+                    postText ++ "\n\n"
+    appendFile boardfileName postString
 
 displayHelp = do
     putStrLn ""
