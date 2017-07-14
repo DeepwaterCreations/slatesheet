@@ -1,6 +1,7 @@
 import System.Environment
 import System.Directory
 import System.IO
+import System.Posix.User
 import Data.List
 import Control.Exception
 
@@ -23,7 +24,9 @@ readPost _ = do
     putStr contents
 
 writePost :: [String] -> IO ()
-writePost [postText] = appendFile boardfileName (postText ++ "\n")
+writePost [postText] = do
+    loginName <- getLoginName
+    appendFile boardfileName (loginName ++ " wrote:\n" ++ postText ++ "\n\n")
 
 displayHelp = do
     putStrLn ""
