@@ -25,12 +25,7 @@ main = do
 
 listTopics :: IO ()
 listTopics = do
-    topics <- readFile topicFileName
-    let topicList = lines topics
-        numberedTopicList = zipWith (\n line -> show n ++ 
-                                    " - " ++
-                                    line)
-                                    [0..] topicList
+    numberedTopicList <- getNumberedTopics
     putStrLn "TOPICS OF CAPRICORN"
     putStr $ unlines numberedTopicList
 
@@ -65,3 +60,13 @@ displayHelp = do
     putStrLn ""
     putStrLn "(That's it right now. Come back later.)"
     putStrLn "*****"
+
+getNumberedTopics :: IO [String]
+getNumberedTopics = do
+    topics <- readFile topicFileName
+    let topicList = lines topics
+        numberedTopicList = zipWith (\n line -> show n ++ 
+                                    " - " ++
+                                    line)
+                                    [0..] topicList
+    return numberedTopicList
